@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String
+  password String
+  emailVerified Boolean @default(false)
+  emailVerificationCode String?
+  emailVerificationExpires DateTime?
+  role  String  @default("user")
+  avatar String? // URL or path to avatar image
+  vendorStatus String? // pending, approved, rejected, blocked (only when user requests publication space)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  requests Request[]
+  downloads Download[]
+  purchases Purchase[]
+  vendorApplication VendorApplication?
+}
+
+model BlogPost {
+  id    Int     @id @default(autoincrement())
+  slug  String  @unique
+  title String
+  excerpt String
+  content String @db.Text
+  date  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id    Int     @id @default(autoincrement())
+  productId String  @unique
+  name  String
+  price Float
+  category String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Request {
+  id    Int     @id @default(autoincrement())
+  title String
+  description String? @db.Text
+  budget String?
+  deadline DateTime?
+  templateId Int?
+  status String  @default("open")
+  userId Int?
+  user User? @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Template {
+  id    Int     @id @default(autoincrement())
+  name  String
+  description String @db.Text
+  category String // web, mobile, design
+  price Float
+  imageUrl String?
+  demoUrl String?
+  downloadUrl String?
+  featured Boolean @default(false)
+  createdBy Int? // ID du vendeur qui a créé ce template
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Design {
+  id    Int     @id @default(autoincrement())
+  title String
+  description String @db.Text
+  category String // logo, ui, graphic, illustration
+  imageUrl String
+  price Float
+  featured Boolean @default(false)
+  createdBy Int? // ID du vendeur qui a créé ce design
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Download {
+  id    Int     @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  itemType String // template, design
+  itemId Int
+  itemName String
+  vendorId Int? // ID du vendeur dont l'item a été téléchargé
+  createdAt DateTime @default(now())
+}
+
+model Purchase {
+  id    Int     @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  itemType String // template, design, product
+  itemId Int
+  itemName String
+  amount Float
+  vendorId Int? // ID du vendeur dont l'item a été acheté
+  createdAt DateTime @default(now())
+}
+
+model VendorApplication {
+  id    Int     @id @default(autoincrement())
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+  
+  // Informations personnelles
+  firstName String
+  lastName String
+  email String
+  phone String
+  
+  // Documents
+  documentType String // carte-identite, passeport, permis
+  documentNumber String
+  documentFilePath String? // Path to uploaded document
+  
+  // Boutique
+  storeName String
+  storeType String // boutique, freelance, entreprise
+  storeDescription String @db.Text
+  
+  // Status
+  status String @default("pending") // pending, approved, rejected
+  rejectionReason String? @db.Text
+  
+  // Activation code (4 digits sent to user when approved)
+  activationCode String? @db.Char(4)
+  activationCodeExpiresAt DateTime?
+  activationCodeVerified Boolean @default(false)
+  
+  // User PIN (4 digits user sets after verifying activation code)
+  // Store the hashed PIN (bcrypt hashes are longer than 4 chars)
+  userPin String? @db.VarChar(191) // Hashed PIN
+  pinSetAt DateTime?
+  
+  // Blocage (pour les espaces approuvés)
+  isBlocked Boolean @default(false)
+  blockReason String? @db.Text
+  blockedAt DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products VendorProduct[]
+  socialShares SocialMediaShare[]
+}
+
+model VendorProduct {
+  id    Int     @id @default(autoincrement())
+  vendorApplicationId Int
+  vendorApplication VendorApplication @relation(fields: [vendorApplicationId], references: [id])
+  
+  // Informations produit
+  title String
+  description String @db.Text
+  price Float
+  comparePrice Float? // Prix barré (ancien prix)
+  
+  // Stock
+  stock Int @default(0)
+  trackStock Boolean @default(true)
+  
+  // Catégorie et type
+  category String // template, design, service, digital, other
+  subcategory String?
+  
+  // Images
+  images Json @default("[]") // Array of image URLs
+  thumbnailUrl String?
+  
+  // Fichier numérique (si applicable)
+  downloadUrl String?
+  downloadFileName String?
+  
+  // Status
+  status String @default("draft") // draft, published, archived
+  isActive Boolean @default(true)
+  
+  // SEO
+  slug String @unique
+  metaTitle String?
+  metaDescription String?
+  
+  // Stats
+  views Int @default(0)
+  sales Int @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders VendorOrder[]
+}
+
+model VendorOrder {
+  id    Int     @id @default(autoincrement())
+  orderNumber String @unique
+  
+  // Acheteur
+  buyerId Int
+  buyerEmail String
+  buyerName String
+  
+  // Produit
+  productId Int
+  product VendorProduct @relation(fields: [productId], references: [id])
+  
+  // Vendeur
+  vendorApplicationId Int
+  
+  // Prix
+  quantity Int @default(1)
+  unitPrice Float
+  totalAmount Float
+  
+  // Status
+  status String @default("pending") // pending, processing, completed, cancelled, refunded
+  
+  // Livraison (si applicable)
+  deliveryMethod String? // download, email, physical
+  downloadedAt DateTime?
+  
+  // Paiement
+  paymentStatus String @default("pending") // pending, paid, failed, refunded
+  paymentMethod String?
+  transactionId String?
+  
+  // Notes
+  customerNote String? @db.Text
+  vendorNote String? @db.Text
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SocialMediaShare {
+  id    Int     @id @default(autoincrement())
+  
+  // Référence au produit partagé
+  articleId String
+  articleTitle String
+  articleUrl String
+  
+  // Vendeur
+  vendorApplicationId Int
+  vendor VendorApplication @relation(fields: [vendorApplicationId], references: [id])
+  
+  // Plateforme et résultat
+  platform String // facebook, linkedin, instagram, tiktok
+  status String // success, failed, pending
+  postId String? // ID du post sur la plateforme
+  postUrl String? // URL du post publié
+  
+  // Détails de l'erreur (si échouée)
+  errorMessage String? @db.Text
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

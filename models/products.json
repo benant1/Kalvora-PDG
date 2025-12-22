@@ -1,0 +1,4 @@
+[
+  { "id": "tpl-001", "name": "Template Tech 001", "price": 19.99, "category": "tech" },
+  { "id": "des-101", "name": "Design Pack 101", "price": 29.99, "category": "design" }
+]

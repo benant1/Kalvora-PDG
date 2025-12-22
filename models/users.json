@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "BEN ANT",
+    "email": "anitcheouben14@gmail.com",
+    "password": "$2b$10$96SInsJqGj6epfwHG3yqC.4.OxHzVTPH0EvJvurEZ2rRcNgyvZtZ6",
+    "role": "developer",
+    "createdAt": "2025-12-04T07:45:41.837Z"
+  },
+  {
+    "id": 2,
+    "name": "BEN ANT",
+    "email": "anitcheouben1@gmail.com",
+    "password": "$2b$10$OzhN1YgQx1tVQoOYN.FzKOzLeN7bxGNdjm1czpDt34AHirpnQt3qG",
+    "role": "developer",
+    "createdAt": "2025-12-04T09:10:45.038Z"
+  },
+  {
+    "id": 3,
+    "name": "Test User",
+    "email": "test@test.com",
+    "password": "$2b$10$EtL20GzR6AMNwJZ7H2acw.rB0TclJh/Kv1KhBREqNbZtG7YHAcMiC",
+    "role": "user",
+    "createdAt": "2025-12-04T09:14:29.373Z"
+  },
+  {
+    "id": 4,
+    "name": "Nouveau Test",
+    "email": "nouveau@test.com",
+    "password": "$2b$10$rg574wopFa3ikAMB3ZVun.3TcjZ7MSOwe6vRczOeXQvCLMYl0SlVC",
+    "role": "user",
+    "createdAt": "2025-12-04T09:18:11.984Z"
+  }
+]

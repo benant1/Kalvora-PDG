@@ -1,0 +1,4 @@
+[
+  { "id": "hello-world", "title": "Hello World", "excerpt": "Bienvenue sur le blog", "content": "Contenu...", "date": "2025-12-01" },
+  { "id": "update-2025", "title": "Mise à jour", "excerpt": "Nouvelles fonctionnalités", "content": "Contenu...", "date": "2025-12-02" }
+]
