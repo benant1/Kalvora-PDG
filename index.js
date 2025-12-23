@@ -16,19 +16,41 @@ const __dirname = path.dirname(__filename)
 const app = express()
 const PORT = process.env.PORT || 4000
 
-// Configuration CORS simplifiée
+// Configuration CORS
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:4000',
+  'https://kalvora-pdg.vercel.app',
+  'https://kalvora-pdg-frontend.vercel.app',
+  'https://kalvora-odkkb92xx-benant1s-projects.vercel.app',
+  /^https:\/\/kalvora-.*-benant1s-projects\.vercel\.app$/ // Pattern pour les déploiements de prévisualisation Vercel
+]
+
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:4000',
-    'https://kalvora-pdg.vercel.app',
-    'https://kalvora-pdg-frontend.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    // Autoriser les requêtes sans origine (comme les applications mobiles ou Postman)
+    if (!origin) return callback(null, true)
+    
+    // Vérifier si l'origine est dans la liste blanche
+    if (allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return origin === allowedOrigin
+      } else if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin)
+      }
+      return false
+    })) {
+      return callback(null, true)
+    }
+    
+    return callback(new Error('Not allowed by CORS'))
+  },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   credentials: true,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
+  preflightContinue: false
 }
 
 // Configuration de sécurité
@@ -41,6 +63,11 @@ app.use(helmet({
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use(morgan('dev'))
+
+// Gestionnaire pour les requêtes OPTIONS (prévol)
+app.options('*', cors(corsOptions), (req, res) => {
+  res.status(200).send()
+})
 
 // Middleware CORS spécifique pour les fichiers uploadés
 app.use('/uploads', (req, res, next) => {
