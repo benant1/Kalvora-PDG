@@ -2,27 +2,16 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["prisma/**"]
-      }
+      "src": "index.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "server.js"
-    }
-  ],
-  "build": {
-    "env": {
-      "PRISMA_GENERATE_FLAG": "true"
-    }
-  },
-  "env": {
-    "PRISMA_GENERATE_FLAG": "true"
-  },
-  "buildCommand": "prisma generate && prisma migrate deploy",
-  "installCommand": "npm install"
+    { "src": "/api/(.*)", "dest": "/index.js" },
+    { "src": "/health", "dest": "/index.js" },
+    { "src": "/test", "dest": "/index.js" },
+    { "src": "/diagnostic", "dest": "/index.js" },
+    { "src": "/(.*)", "dest": "/index.js" }
+  ]
+ 
 }

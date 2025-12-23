@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 4000
 
 // Configuration CORS stricte pour autoriser les images cross-origin
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:4000'],
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:4000','https://kalvora-pdg.vercel.app'],
   credentials: true,
   methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
