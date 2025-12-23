@@ -16,28 +16,18 @@ const __dirname = path.dirname(__filename)
 const app = express()
 const PORT = process.env.PORT || 4000
 
-// Configuration CORS
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://localhost:4000',
-  'https://kalvora-pdg.vercel.app',
-  'https://kalvora-pdg-frontend.vercel.app'
-]
-
+// Configuration CORS simplifiée
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
-    } else {
-      console.warn('Blocked by CORS:', origin)
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  origin: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:4000',
+    'https://kalvora-pdg.vercel.app',
+    'https://kalvora-pdg-frontend.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  preflightContinue: false,
+  credentials: true,
   optionsSuccessStatus: 204
 }
 
@@ -47,8 +37,7 @@ app.use(helmet({
   contentSecurityPolicy: false
 }))
 
-// Gestion des requêtes OPTIONS
-app.options('*', cors(corsOptions))
+// Middleware CORS
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use(morgan('dev'))
