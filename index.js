@@ -64,10 +64,27 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() })
 })
 
+// Route racine
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Bienvenue sur l\'API Kalvora PDG',
+    version: '1.0.0',
+    documentation: 'https://github.com/benant1/Kalvora-PDG',
+    health: '/health',
+    api: '/api/v1'
+  })
+})
+
+// Routes API
 app.use('/api/v1', apiRouter)
 
+// Gestion des erreurs 404
 app.use((req, res) => {
-  res.status(404).json({ error: 'Not Found' })
+  res.status(404).json({ 
+    error: 'Not Found',
+    message: `La route ${req.method} ${req.path} n'existe pas`,
+    availableRoutes: ['/api/v1', '/health']
+  })
 })
 
 app.use((err, req, res, next) => {
