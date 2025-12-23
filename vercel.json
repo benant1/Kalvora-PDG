@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["prisma/**"]
+      }
     }
   ],
   "routes": [
@@ -11,5 +14,15 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "PRISMA_GENERATE_FLAG": "true"
+    }
+  },
+  "env": {
+    "PRISMA_GENERATE_FLAG": "true"
+  },
+  "buildCommand": "prisma generate && prisma migrate deploy",
+  "installCommand": "npm install"
 }
