@@ -134,10 +134,19 @@ export async function login(req, res) {
     const { password, ...userWithoutPassword } = user
     const token = issueToken(user)
 
+    // S'assurer que l'URL de l'avatar est complète
+    let userResponse = { ...userWithoutPassword }
+    if (userResponse.avatar && !userResponse.avatar.startsWith('http') && !userResponse.avatar.startsWith('https')) {
+      const baseUrl = process.env.API_BASE_URL || 'https://kalvora-pdg.vercel.app'
+      userResponse.avatar = userResponse.avatar.startsWith('/') 
+        ? `${baseUrl}${userResponse.avatar}`
+        : `${baseUrl}/${userResponse.avatar}`
+    }
+
     res.json({ 
       message: 'Login successful',
       token, 
-      user: userWithoutPassword 
+      user: userResponse
     })
   } catch (err) {
     if (err instanceof z.ZodError) {

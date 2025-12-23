@@ -109,9 +109,16 @@ export async function updateAvatar(req, res) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    const { avatar } = req.body
+    let { avatar } = req.body
     if (!avatar) {
       return res.status(400).json({ error: 'Avatar URL is required' })
+    }
+
+    // S'assurer que l'URL de l'avatar est complète
+    if (!avatar.startsWith('http') && !avatar.startsWith('https')) {
+      // Si c'est un chemin relatif, ajouter l'URL de base
+      const baseUrl = process.env.API_BASE_URL || 'https://kalvora-pdg.vercel.app'
+      avatar = avatar.startsWith('/') ? `${baseUrl}${avatar}` : `${baseUrl}/${avatar}`
     }
 
     const updatedUser = await prisma.user.update({

@@ -75,10 +75,14 @@ router.post('/avatar', requireAuth, upload.single('avatar'), async (req, res) =>
       }
     }
 
-    // Mettre à jour l'avatar dans la base de données
+    // Construire l'URL complète de l'avatar
+    const baseUrl = process.env.API_BASE_URL || 'https://kalvora-pdg.vercel.app'
+    const avatarUrl = `${baseUrl}${avatarPath}`
+    
+    // Mettre à jour l'avatar dans la base de données avec l'URL complète
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { avatar: avatarPath },
+      data: { avatar: avatarUrl },
       select: {
         id: true,
         email: true,
