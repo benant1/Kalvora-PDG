@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { prisma } from '../lib/prisma.js'
 import { issueToken } from '../middleware/auth.js'
 import { sendVerificationEmail } from '../services/emailService.js'
+import { normalizeUserAvatar } from '../utils/avatarUtils.js'
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -134,14 +135,8 @@ export async function login(req, res) {
     const { password, ...userWithoutPassword } = user
     const token = issueToken(user)
 
-    // S'assurer que l'URL de l'avatar est complète
-    let userResponse = { ...userWithoutPassword }
-    if (userResponse.avatar && !userResponse.avatar.startsWith('http') && !userResponse.avatar.startsWith('https')) {
-      const baseUrl = process.env.API_BASE_URL || 'https://kalvora-pdg.vercel.app'
-      userResponse.avatar = userResponse.avatar.startsWith('/') 
-        ? `${baseUrl}${userResponse.avatar}`
-        : `${baseUrl}/${userResponse.avatar}`
-    }
+    // Normaliser l'URL de l'avatar
+    const userResponse = normalizeUserAvatar(userWithoutPassword)
 
     res.json({ 
       message: 'Login successful',
@@ -181,7 +176,10 @@ export async function me(req, res) {
       return res.status(404).json({ error: 'User not found' })
     }
 
-    res.json(user)
+    // Normaliser l'URL de l'avatar
+    const userResponse = normalizeUserAvatar(user)
+
+    res.json(userResponse)
   } catch (error) {
     console.error('[Me Error]', error)
     res.status(500).json({ error: 'Internal server error' })

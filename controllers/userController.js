@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import { normalizeUserAvatar } from '../utils/avatarUtils.js'
 
 const prisma = new PrismaClient()
 
@@ -29,7 +30,7 @@ export async function updateProfile(req, res) {
       }
     }
 
-    const updatedUser = await prisma.user.update({
+    const user = await prisma.user.update({
       where: { id: userId },
       data: { name, email },
       select: {
@@ -42,7 +43,9 @@ export async function updateProfile(req, res) {
       }
     })
 
-    res.json(updatedUser)
+    // Normaliser l'URL de l'avatar
+    const userResponse = normalizeUserAvatar(user)
+    res.json(userResponse)
   } catch (err) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ error: 'Validation failed', issues: err.issues })
@@ -121,7 +124,7 @@ export async function updateAvatar(req, res) {
       avatar = avatar.startsWith('/') ? `${baseUrl}${avatar}` : `${baseUrl}/${avatar}`
     }
 
-    const updatedUser = await prisma.user.update({
+    const user = await prisma.user.update({
       where: { id: userId },
       data: { avatar },
       select: {
@@ -134,7 +137,9 @@ export async function updateAvatar(req, res) {
       }
     })
 
-    res.json(updatedUser)
+    // Normaliser l'URL de l'avatar
+    const userResponse = normalizeUserAvatar(user)
+    res.json(userResponse)
   } catch (err) {
     console.error('[Update Avatar Error]', err)
     res.status(500).json({ error: 'Internal server error' })
