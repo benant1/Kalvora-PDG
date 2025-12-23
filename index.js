@@ -16,17 +16,39 @@ const __dirname = path.dirname(__filename)
 const app = express()
 const PORT = process.env.PORT || 4000
 
-// Configuration CORS stricte pour autoriser les images cross-origin
+// Configuration CORS
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:4000',
+  'https://kalvora-pdg.vercel.app',
+  'https://kalvora-pdg-frontend.vercel.app'
+]
+
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:4000','https://kalvora-pdg.vercel.app'],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      console.warn('Blocked by CORS:', origin)
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true,
-  methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }
 
+// Configuration de sécurité
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' }
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false
 }))
+
+// Gestion des requêtes OPTIONS
+app.options('*', cors(corsOptions))
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use(morgan('dev'))

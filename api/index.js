@@ -14,7 +14,6 @@ import adminRoutes from '../routes/adminRoutes.js';
 const app = express();
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // Middleware de logging
