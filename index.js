@@ -65,8 +65,17 @@ app.use(express.json())
 app.use(morgan('dev'))
 
 // Gestionnaire pour les requêtes OPTIONS (prévol)
-app.options('*', cors(corsOptions), (req, res) => {
-  res.status(200).send()
+// Note: Le middleware CORS gère déjà les OPTIONS, mais on ajoute un handler explicite
+// pour Vercel serverless (sans utiliser '*' qui cause des problèmes avec path-to-regexp)
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*')
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept')
+    res.header('Access-Control-Allow-Credentials', 'true')
+    return res.status(200).send()
+  }
+  next()
 })
 
 // Middleware CORS spécifique pour les fichiers uploadés
