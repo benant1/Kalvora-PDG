@@ -23,10 +23,12 @@ const allowedOrigins = [
   'http://localhost:4000',
   'https://kalvora-pdg.vercel.app',
   'https://kalvora-pdg-frontend.vercel.app',
+  'https://kalvora.vercel.app',
   // Patterns pour toutes les URLs Vercel (production et preview)
   /^https:\/\/kalvora-pdg.*\.vercel\.app$/,
   /^https:\/\/kalvora-pdg-frontend.*\.vercel\.app$/,
-  /^https:\/\/kalvora-.*-benant1s-projects\.vercel\.app$/
+  /^https:\/\/kalvora-.*-benant1s-projects\.vercel\.app$/,
+  /^https:\/\/kalvora.*\.vercel\.app$/
 ]
 
 const corsOptions = {
