@@ -10,33 +10,20 @@
     {
       "src": "/api/(.*)",
       "dest": "/index.js",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-      "headers": {
-        "Access-Control-Allow-Origin": "https://kalvora-odkkb92xx-benant1s-projects.vercel.app",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept",
-        "Access-Control-Allow-Credentials": "true"
-      }
+      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     },
-    { 
-      "src": "/health", 
+    {
+      "src": "/health",
       "dest": "/index.js",
-      "methods": ["GET", "OPTIONS"],
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS"
-      }
+      "methods": ["GET", "OPTIONS"]
     },
-    { 
-      "src": "/(.*)", 
+    {
+      "src": "/(.*)",
       "dest": "/index.js",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-      "headers": {
-        "Access-Control-Allow-Origin": "https://kalvora-odkkb92xx-benant1s-projects.vercel.app",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept",
-        "Access-Control-Allow-Credentials": "true"
-      }
+      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
