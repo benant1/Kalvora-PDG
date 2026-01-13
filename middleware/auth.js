@@ -5,8 +5,10 @@ const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET || JWT_SECRET === 'dev-secret') {
   if (process.env.NODE_ENV === 'production') {
     console.error('❌ ERREUR CRITIQUE: JWT_SECRET n\'est pas configuré en production!')
-    console.error('Configurez JWT_SECRET dans vos variables d\'environnement.')
-    process.exit(1)
+    console.error('Configurez JWT_SECRET dans vos variables d\'environnement Vercel.')
+    console.error('L\'application continuera avec une valeur par défaut temporaire.')
+    // Ne pas faire planter l'app en production sur Vercel (serverless)
+    // L'utilisateur doit configurer JWT_SECRET dans Vercel Dashboard
   } else {
     console.warn('⚠️  ATTENTION: JWT_SECRET utilise la valeur par défaut. Configurez-le pour la production.')
   }

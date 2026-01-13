@@ -116,9 +116,19 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error('[Error]', err)
-  res.status(500).json({ error: 'Internal Server Error' })
+  console.error('[Error Stack]', err.stack)
+  res.status(500).json({ 
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' ? 'An error occurred' : err.message
+  })
 })
 
-app.listen(PORT, () => {
-  console.log(`Backend listening on http://localhost:${PORT}`)
-})
+// Export pour Vercel serverless
+export default app
+
+// Pour le développement local
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Backend listening on http://localhost:${PORT}`)
+  })
+}
