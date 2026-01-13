@@ -23,26 +23,44 @@ const allowedOrigins = [
   'http://localhost:4000',
   'https://kalvora-pdg.vercel.app',
   'https://kalvora-pdg-frontend.vercel.app',
-  'https://kalvora-odkkb92xx-benant1s-projects.vercel.app',
-  /^https:\/\/kalvora-.*-benant1s-projects\.vercel\.app$/ // Pattern pour les déploiements de prévisualisation Vercel
+  // Patterns pour toutes les URLs Vercel (production et preview)
+  /^https:\/\/kalvora-pdg.*\.vercel\.app$/,
+  /^https:\/\/kalvora-pdg-frontend.*\.vercel\.app$/,
+  /^https:\/\/kalvora-.*-benant1s-projects\.vercel\.app$/
 ]
 
 const corsOptions = {
   origin: function (origin, callback) {
     // Autoriser les requêtes sans origine (comme les applications mobiles ou Postman)
-    if (!origin) return callback(null, true)
+    if (!origin) {
+      return callback(null, true)
+    }
+    
+    // En développement, logger l'origine pour déboguer
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[CORS] Checking origin:', origin)
+    }
     
     // Vérifier si l'origine est dans la liste blanche
-    if (allowedOrigins.some(allowedOrigin => {
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
       if (typeof allowedOrigin === 'string') {
         return origin === allowedOrigin
       } else if (allowedOrigin instanceof RegExp) {
         return allowedOrigin.test(origin)
       }
       return false
-    })) {
+    })
+    
+    if (isAllowed) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[CORS] Origin allowed:', origin)
+      }
       return callback(null, true)
     }
+    
+    // Logger l'origine refusée pour déboguer
+    console.warn('[CORS] Origin not allowed:', origin)
+    console.warn('[CORS] Allowed origins:', allowedOrigins)
     
     return callback(new Error('Not allowed by CORS'))
   },
@@ -69,7 +87,24 @@ app.use(morgan('dev'))
 // pour Vercel serverless (sans utiliser '*' qui cause des problèmes avec path-to-regexp)
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Origin', req.headers.origin || '*')
+    const origin = req.headers.origin
+    
+    // Vérifier si l'origine est autorisée
+    const isAllowed = !origin || allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return origin === allowedOrigin
+      } else if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin)
+      }
+      return false
+    })
+    
+    if (isAllowed && origin) {
+      res.header('Access-Control-Allow-Origin', origin)
+    } else if (!origin) {
+      res.header('Access-Control-Allow-Origin', '*')
+    }
+    
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept')
     res.header('Access-Control-Allow-Credentials', 'true')
