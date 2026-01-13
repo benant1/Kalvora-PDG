@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.API_BASE_URL || 'https://kalvora-pdg.vercel.app
  * @param {string} avatar - L'URL de l'avatar à normaliser
  * @returns {string} - L'URL normalisée
  */
-function normalizeAvatarUrl(avatar) {
+export function normalizeAvatarUrl(avatar) {
   if (!avatar) return '';
   
   // Si c'est déjà une URL complète, on la retourne telle quelle
@@ -24,7 +24,7 @@ function normalizeAvatarUrl(avatar) {
  * @param {Object} user - L'objet utilisateur
  * @returns {Object} - L'objet utilisateur avec l'URL de l'avatar normalisée
  */
-function normalizeUserAvatar(user) {
+export function normalizeUserAvatar(user) {
   if (!user || !user.avatar) return user;
   
   return {
@@ -32,8 +32,3 @@ function normalizeUserAvatar(user) {
     avatar: normalizeAvatarUrl(user.avatar)
   };
 }
-
-module.exports = {
-  normalizeAvatarUrl,
-  normalizeUserAvatar
-};
